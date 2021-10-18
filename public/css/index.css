@@ -1,0 +1,83 @@
+:root {
+    --size-border: 16px;
+    --color-border: rgba(0, 0, 0, 0.541);
+}
+
+* {
+    box-sizing: border-box;
+    font-family: 'calibri';
+}
+
+body {
+    background: rgb(34, 34, 34);
+    position: relative;
+}
+
+.cuadrito {
+    width: 80px;
+    height: 80px;
+    background: #737878;
+    position: relative;
+    box-shadow: 1px 1px 4px 1px black;
+    transition: border .2s ease;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-family: calibri;
+    font-size: 50px;
+    color: #00000075;
+    font-weight: bold;
+}
+
+.border {
+    position: absolute;
+    background: rgba(0, 0, 0, 0);
+    transition: all .2s ease;
+    border-radius: 20px;
+}
+
+.hov:hover {
+    cursor: pointer;
+    background: var(--color-border);
+    border-radius: 0px;
+    box-shadow: 1px 1px 1px black;
+    ;
+}
+
+.top {
+    z-index: 9;
+    top: -8px;
+    width: 100%;
+    height: var(--size-border);
+}
+
+.left {
+    z-index: 9;
+    left: -8px;
+    width: var(--size-border);
+    height: 100%;
+}
+
+.right {
+    z-index: 9;
+    right: -8px;
+    width: var(--size-border);
+    height: 100%;
+}
+
+.bottom {
+    z-index: 9;
+    bottom: -8px;
+    width: 100%;
+    height: var(--size-border);
+}
+
+.rows {
+    display: flex;
+}
+
+#container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}

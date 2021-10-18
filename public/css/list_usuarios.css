@@ -1,0 +1,68 @@
+input,
+button {
+    border: none;
+    outline: none;
+}
+
+.usuarios-container {
+    position: absolute;
+    left: 0;
+    top: 0;
+}
+
+.usuarios-container .inputs {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-bottom: 12px;
+}
+
+.inputs>#name {
+    padding: 8px 12px;
+    background: rgb(22, 22, 22);
+    color: rgb(185, 185, 185);
+    width: 200px;
+    font-size: 16px;
+}
+
+.inputs>#btn_add {
+    padding: 8px 20px;
+    background: rgb(21, 117, 21);
+    color: white;
+    border-radius: 8px;
+    cursor: pointer;
+}
+
+.collection-usuarios>.item-usuario {
+    padding: 8px;
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 4px;
+}
+
+.collection-usuarios>.item-usuario>.user-name {
+    font-size: 16px;
+    display: flex;
+    font-weight: bold;
+    flex-direction: column;
+    justify-content: start;
+    color: rgb(233, 233, 233);
+    padding-left: 8px;
+}
+
+.collection-usuarios>.item-usuario>.user-name>span {
+    font-size: 14px;
+    font-weight: normal;
+}
+
+.collection-usuarios>.item-usuario>.user-color {
+    width: 40px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    height: 40px;
+    color: #00000075;
+    font-size: 24px;
+    font-weight: bold;
+    border-radius: 4px;
+}
