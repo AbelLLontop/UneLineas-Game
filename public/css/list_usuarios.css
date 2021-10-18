@@ -4,11 +4,7 @@ button {
     outline: none;
 }
 
-.usuarios-container {
-    position: absolute;
-    left: 0;
-    top: 0;
-}
+
 
 .usuarios-container .inputs {
     display: flex;
@@ -21,8 +17,11 @@ button {
     padding: 8px 12px;
     background: rgb(22, 22, 22);
     color: rgb(185, 185, 185);
-    width: 200px;
+    width: 100%;
     font-size: 16px;
+}
+.inputs>#color {
+   width: 50px;
 }
 
 .inputs>#btn_add {
