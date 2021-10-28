@@ -84,8 +84,7 @@ body {
 
 }
 
-.usuarios-container {
-}
+
 #container {
     flex-grow: 1;
     display: flex;

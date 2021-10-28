@@ -8,96 +8,115 @@ class Jugador {
         this.id = Math.floor(Math.random() * 100);
     }
 }
-class BordeDivHover {
-    constructor(clase) {
+class DivElement {
+    constructor() {
         this.objeto = document.createElement('div');
+        this.grosor = 6;
+        this.accionesBordes = {
+            "top": (color) => this.objeto.style.borderTop = `solid ${this.grosor}px ${color}`,
+            "bottom": (color) => this.objeto.style.borderBottom = `solid ${this.grosor}px ${color}`,
+            "left": (color) => this.objeto.style.borderLeft = `solid ${this.grosor}px ${color}`,
+            "right": (color) => this.objeto.style.borderRight = `solid ${this.grosor}px ${color}`,
+        };
+    }
+    getElement() {
+        return this.objeto;
+    }
+    ;
+    pintar(color) {
+        this.objeto.style.background = `${color}`;
+    }
+    addElement(element) {
+        this.objeto.appendChild(element);
+    }
+    addText(text) {
+        this.objeto.innerHTML = `${text}`;
+    }
+    pintarBorde(color, lado) {
+        this.accionesBordes[lado](color);
+    }
+    quitarBordes() {
+        this.objeto.style.border = 'none';
+    }
+}
+class BordeDiv extends DivElement {
+    constructor(clase) {
+        super();
         this.objeto.classList.add('border');
         this.objeto.classList.add('hov');
         this.objeto.classList.add(clase);
     }
 }
-class CuadroDiv {
+class Borde {
+    constructor(name) {
+        this.name = name;
+        this.objetoDiv = new BordeDiv(this.name);
+        this.state = false;
+    }
+    activate() {
+        this.state = true;
+    }
+}
+class Lados {
     constructor() {
-        this.grosor = 6;
-        this.bordes = {
-            top: new BordeDivHover('top'),
-            bottom: new BordeDivHover('bottom'),
-            left: new BordeDivHover('left'),
-            right: new BordeDivHover('right'),
+        this.top = new Borde('top');
+        this.left = new Borde('left');
+        this.right = new Borde('right');
+        this.bottom = new Borde('bottom');
+    }
+    validarTodos() {
+        return (this.bottom.state && this.top.state && this.right.state && this.left.state);
+    }
+    getLado(lado) {
+        let retorno = {
+            'top': this.top,
+            'bottom': this.bottom,
+            'left': this.left,
+            'right': this.right
         };
-        this.objeto = document.createElement('div');
+        return retorno[lado];
+    }
+}
+class CuadroDiv extends DivElement {
+    constructor(lados) {
+        super();
         this.objeto.classList.add('cuadrito');
-        this.objeto.appendChild(this.bordes.top.objeto);
-        this.objeto.appendChild(this.bordes.bottom.objeto);
-        this.objeto.appendChild(this.bordes.left.objeto);
-        this.objeto.appendChild(this.bordes.right.objeto);
+        this.agregarLados(lados);
     }
-    pintarTop(jugador) {
-        this.objeto.style.borderTop = `solid ${this.grosor}px ${jugador.color}`;
-    }
-    pintarBottom(jugador) {
-        this.objeto.style.borderBottom = `solid ${this.grosor}px ${jugador.color}`;
-    }
-    pintarRight(jugador) {
-        this.objeto.style.borderRight = `solid ${this.grosor}px ${jugador.color}`;
-    }
-    pintarLeft(jugador) {
-        this.objeto.style.borderLeft = `solid ${this.grosor}px ${jugador.color}`;
-    }
-    check(jugador) {
-        this.objeto.style.backgroundColor = `${jugador.color}`;
-        this.objeto.innerHTML = jugador.name.charAt(0);
-        this.objeto.style.border = "none";
+    agregarLados(lados) {
+        this.addElement(lados.bottom.objetoDiv.getElement());
+        this.addElement(lados.left.objetoDiv.getElement());
+        this.addElement(lados.right.objetoDiv.getElement());
+        this.addElement(lados.top.objetoDiv.getElement());
     }
 }
 class Cuadro {
-    constructor(position, state = false) {
-        this.lados = {
-            top: false,
-            bottom: false,
-            left: false,
-            right: false
+    constructor(position) {
+        this.accionesActivarLado = {
+            "top": () => this.lados.top.activate(),
+            "bottom": () => this.lados.bottom.activate(),
+            "left": () => this.lados.left.activate(),
+            "right": () => this.lados.right.activate(),
         };
         this.position = position;
-        this.state = state;
-        this.objectdiv = new CuadroDiv();
+        this.state = false;
+        this.lados = new Lados();
+        this.objetoDiv = new CuadroDiv(this.lados);
     }
-    pintar(jugador, lado) {
-        if (!this.state) {
-            switch (lado) {
-                case 'top':
-                    if (!this.lados.top) {
-                        this.objectdiv.pintarTop(jugador);
-                        this.lados.top = true;
-                    }
-                    break;
-                case 'bottom':
-                    if (!this.lados.bottom) {
-                        this.objectdiv.pintarBottom(jugador);
-                        this.lados.bottom = true;
-                    }
-                    break;
-                case 'left':
-                    if (!this.lados.left) {
-                        this.objectdiv.pintarLeft(jugador);
-                        this.lados.left = true;
-                    }
-                    break;
-                case 'right':
-                    if (!this.lados.right) {
-                        this.objectdiv.pintarRight(jugador);
-                        this.lados.right = true;
-                    }
-                    break;
-                default:
-                    console.log('opciones disponibles: top | right | left | bottom');
-                    break;
-            }
-            if (this.lados.bottom && this.lados.top && this.lados.right && this.lados.left) {
-                this.state = true;
-                this.objectdiv.check(jugador);
-            }
+    pintarLado(color, lado) {
+        if (!this.lados.validarTodos()) {
+            this.objetoDiv.pintarBorde(color, lado);
+            this.accionesActivarLado[lado]();
         }
+        if (this.lados.validarTodos()) {
+            this.state = true;
+            this.rellenar(color, lado);
+        }
+    }
+    rellenar(color, name) {
+        this.objetoDiv.pintar(color);
+        this.objetoDiv.addText(name.charAt(0));
+        this.objetoDiv.quitarBordes();
     }
 }
 class Tablero {
@@ -116,12 +135,39 @@ class Tablero {
                 let position = { x: k, y: i };
                 let cuadrito = new Cuadro(position);
                 this.cuadros.push(cuadrito);
-                newDiv.appendChild(cuadrito.objectdiv.objeto);
+                newDiv.appendChild(cuadrito.objetoDiv.getElement());
             }
             main === null || main === void 0 ? void 0 : main.appendChild(newDiv);
         }
     }
+    buscarCuadroHermano(position, lado) {
+        const positionExtra = {
+            'bottom': { x: 0, y: -1 },
+            'top': { x: 0, y: 1 },
+            'left': { x: -1, y: 0 },
+            'right': { x: 1, y: 0 }
+        };
+        let positionHermano = { x: position.x + positionExtra[lado].x, y: position.y + positionExtra[lado].y };
+        return this.cuadros.filter((cuadro) => (cuadro.position.x == positionHermano.x) && (cuadro.position.y == positionHermano.y));
+    }
 }
+class Jugada {
+    constructor(cuadro, lado) {
+        this.cuadro = cuadro;
+        this.lado = lado;
+    }
+}
+//helpers
+function ladoInverso(lado) {
+    const inverso = {
+        'bottom': 'top',
+        'top': 'bottom',
+        'left': 'right',
+        'right': 'left'
+    };
+    return inverso[lado];
+}
+//-------------------
 class Game {
     constructor() {
         this.jugadores = [];
@@ -139,73 +185,50 @@ class Game {
         }
         this.jugadorActual = this.jugadores[this.playerPos];
     }
+    jugar(jugada, jugador) {
+        var _a;
+        let jugando = false;
+        if (!jugada.cuadro.lados.getLado(jugada.lado).state) {
+            jugada.cuadro.pintarLado(jugador.color, jugada.lado);
+            jugada.cuadro.lados.getLado(jugada.lado).objetoDiv.getElement().classList.remove('hov');
+            let hermano = this.tablero.buscarCuadroHermano(jugada.cuadro.position, jugada.lado);
+            if (hermano.length > 0) {
+                hermano[0].pintarLado(jugador.color, ladoInverso(jugada.lado));
+                hermano[0].lados.getLado(ladoInverso(jugada.lado)).objetoDiv.getElement().classList.remove('hov');
+            }
+            if (!jugada.cuadro.state && !((_a = hermano[0]) === null || _a === void 0 ? void 0 : _a.state)) {
+                jugando = true;
+            }
+        }
+        return jugando;
+    }
     eventos() {
-        //literal todo el juego xD
         for (let cuadro of this.tablero.cuadros) {
-            cuadro.objectdiv.bordes.top.objeto.addEventListener('click', () => {
-                var _a;
-                if (!cuadro.lados.top) {
-                    cuadro.pintar(this.jugadorActual, 'top');
-                    cuadro.objectdiv.bordes.top.objeto.classList.remove('hov');
-                    let hermano = this.buscarCuadro({ x: (cuadro.position.x), y: (cuadro.position.y + 1) });
-                    if (hermano.length > 0) {
-                        hermano[0].pintar(this.jugadorActual, 'bottom');
-                        hermano[0].objectdiv.bordes.bottom.objeto.classList.remove('hov');
-                    }
-                    if (!cuadro.state && !((_a = hermano[0]) === null || _a === void 0 ? void 0 : _a.state)) {
-                        this.siguienteJugador();
-                    }
+            cuadro.lados.top.objetoDiv.getElement().addEventListener('click', () => {
+                if (this.jugar(new Jugada(cuadro, 'top'), this.jugadorActual)) {
+                    this.siguienteJugador();
                 }
+                ;
             });
-            cuadro.objectdiv.bordes.bottom.objeto.addEventListener('click', () => {
-                var _a;
-                if (!cuadro.lados.bottom) {
-                    cuadro.pintar(this.jugadorActual, 'bottom');
-                    cuadro.objectdiv.bordes.bottom.objeto.classList.remove('hov');
-                    let hermano = this.buscarCuadro({ x: (cuadro.position.x), y: (cuadro.position.y - 1) });
-                    if (hermano.length > 0) {
-                        hermano[0].pintar(this.jugadorActual, 'top');
-                        hermano[0].objectdiv.bordes.top.objeto.classList.remove('hov');
-                    }
-                    if (!cuadro.state && !((_a = hermano[0]) === null || _a === void 0 ? void 0 : _a.state)) {
-                        this.siguienteJugador();
-                    }
+            cuadro.lados.bottom.objetoDiv.getElement().addEventListener('click', () => {
+                if (this.jugar(new Jugada(cuadro, 'bottom'), this.jugadorActual)) {
+                    this.siguienteJugador();
                 }
+                ;
             });
-            cuadro.objectdiv.bordes.left.objeto.addEventListener('click', () => {
-                var _a;
-                if (!cuadro.lados.left) {
-                    cuadro.pintar(this.jugadorActual, 'left');
-                    cuadro.objectdiv.bordes.left.objeto.classList.remove('hov');
-                    let hermano = this.buscarCuadro({ x: (cuadro.position.x - 1), y: (cuadro.position.y) });
-                    if (hermano.length > 0) {
-                        hermano[0].pintar(this.jugadorActual, 'right');
-                        hermano[0].objectdiv.bordes.right.objeto.classList.remove('hov');
-                    }
-                    if (!cuadro.state && !((_a = hermano[0]) === null || _a === void 0 ? void 0 : _a.state)) {
-                        this.siguienteJugador();
-                    }
+            cuadro.lados.left.objetoDiv.getElement().addEventListener('click', () => {
+                if (this.jugar(new Jugada(cuadro, 'left'), this.jugadorActual)) {
+                    this.siguienteJugador();
                 }
+                ;
             });
-            cuadro.objectdiv.bordes.right.objeto.addEventListener('click', () => {
-                var _a;
-                if (!cuadro.lados.right) {
-                    cuadro.pintar(this.jugadorActual, 'right');
-                    cuadro.objectdiv.bordes.right.objeto.classList.remove('hov');
-                    let hermano = this.buscarCuadro({ x: (cuadro.position.x + 1), y: (cuadro.position.y) });
-                    if (hermano.length > 0) {
-                        hermano[0].pintar(this.jugadorActual, 'left');
-                        hermano[0].objectdiv.bordes.left.objeto.classList.remove('hov');
-                    }
-                    if (!cuadro.state && !((_a = hermano[0]) === null || _a === void 0 ? void 0 : _a.state)) {
-                        this.siguienteJugador();
-                    }
+            cuadro.lados.right.objetoDiv.getElement().addEventListener('click', () => {
+                if (this.jugar(new Jugada(cuadro, 'right'), this.jugadorActual)) {
+                    this.siguienteJugador();
                 }
+                ;
             });
         }
-    }
-    buscarCuadro(position) {
-        return this.tablero.cuadros.filter((cuadro) => (cuadro.position.x == position.x) && (cuadro.position.y == position.y));
     }
     agregarJugador(jugador) {
         this.jugadores.push(jugador);
